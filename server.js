@@ -5,6 +5,7 @@ const cors = require("cors");
 
 const users = require("./routes/users");
 const players = require("./routes/players");
+const teams = require("./routes/teams");
 
 mongoose
   .connect("mongodb://localhost:27017/app", {
@@ -27,6 +28,7 @@ app.use(cors());
 
 app.use("/users", users);
 app.use("/players", players);
+app.use("/teams", teams);
 
 const port = process.env.PORT || 5050;
 

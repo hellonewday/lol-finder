@@ -4,36 +4,44 @@ const config = require("config");
 const Joi = require("@hapi/joi");
 const jwt = require("jsonwebtoken");
 
-const UserSchema = new Schema({
-  username: {
-    type: String,
-    required: true,
-    trim: true,
-    min: 10,
-    max: 20,
-    unique: true,
+const UserSchema = new Schema(
+  {
+    username: {
+      type: String,
+      required: true,
+      trim: true,
+      min: 10,
+      max: 20,
+      unique: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: true,
+      trim: true,
+      min: 6,
+      max: 20,
+    },
+    isAdmin: {
+      type: Boolean,
+      default: false,
+    },
+    player: {
+      type: Schema.Types.ObjectId,
+      ref: "Player",
+    },
   },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  password: {
-    type: String,
-    required: true,
-    trim: true,
-    min: 6,
-    max: 20,
-  },
-  isAdmin: {
-    type: Boolean,
-    default: false,
-  },
-  player: {
-    type: Schema.Types.ObjectId,
-    ref: "Player",
-  },
-});
+  {
+    timestamps: {
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+    },
+  }
+);
 
 UserSchema.methods.getAuthToken = (user) => {
   // console.log(user._id);

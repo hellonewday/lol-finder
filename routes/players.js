@@ -1,14 +1,13 @@
 const router = require("express").Router();
 const auth = require("../middleware/auth");
-const cloudinary = require("cloudinary").v2;
+// const cloudinary = require("cloudinary").v2;
 const multer = require("multer");
-const { addPlayer, allPlayers, onePlayer } = require("../controllers/players");
-
-cloudinary.config({
-  cloud_name: "vn-esports",
-  api_key: "996178356223912",
-  api_secret: "rC8_6QyIf1DIbokVgSYe0VLsJwQ",
-});
+const {
+  addPlayer,
+  allPlayers,
+  onePlayer,
+  removePlayer,
+} = require("../controllers/players");
 
 const uploads = multer({
   storage: multer.memoryStorage(),
@@ -18,7 +17,11 @@ const uploads = multer({
 // router.get("/");
 
 router.get("/", allPlayers);
+
 router.get("/:id", onePlayer);
+
 router.post("/", uploads.single("picture"), auth, addPlayer);
+
+router.delete("/", auth, removePlayer);
 
 module.exports = router;
