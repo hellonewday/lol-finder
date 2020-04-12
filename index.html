@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>Document</title>
+</head>
+
+<body>
+     <p id="example"></p>
+
+     <button onclick="dynamicColor()">Change Color</button>
+
+     </br>
+     <label>Color: </label>
+     </br>
+     <input type="text" id="color" placeholder="Input your color" />
+     <button onclick="changeMyColor(document.getElementById('color').value)">Change your color</button>
+
+
+     </br>
+     <button onclick="alertMe(document.getElementById('color').value)">Alert</button>
+     <button onclick="promptMe()">Prompt Me</button>
+     <button onclick="confirmMe()">Confirm Me</button>
+
+     <!-- Script -->
+     <script src="test.js"></script>
+
+</body>
+
+</html>

@@ -119,14 +119,22 @@ module.exports.updatePlayer = async (req, res, next) => {
 
 module.exports.removePlayer = async (req, res, next) => {
   let isValid = await Player.findOne({ _id: req.params.id });
-
   if (!isValid)
     return res
       .status(404)
       .json({ success: false, message: "Player not found" });
-
-  if (isValid._id !== req.user._id)
+  else if (isValid._id !== req.user._id)
     return res
-      .status(402)
+      .status(401)
       .json({ message: "You don't have permissions to do this action" });
+  else {
+    Player.findByIdAndDelete({ _id: req.params.id })
+      .exec()
+      .then((response) => {
+        return res.status(200).json({ success: true, response });
+      })
+      .catch((error) => {
+        return res.status(400).json({ success: false, error });
+      });
+  }
 };

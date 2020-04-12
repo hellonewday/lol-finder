@@ -9,5 +9,10 @@ const uploads = multer({
 });
 
 router.get("/", controllers.allTeams);
+// router.get("/:id", controllers.oneTeam);
+router.post("/", auth, uploads.single("logo"), controllers.addTeam);
+router.patch("/:id", auth, uploads.single("logo"), controllers.updateTeam);
+router.delete("/:id", auth, controllers.removeTeam);
+// router.get("/test", auth, controllers.testAPI);
 
 module.exports = router;

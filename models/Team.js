@@ -19,9 +19,6 @@ const TeamSchema = new Schema(
       type: String,
       required: false,
     },
-    type: {
-      type: String,
-    },
     description: String,
     members: [
       {
