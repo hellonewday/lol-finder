@@ -22,6 +22,16 @@ module.exports.allTeams = (req, res, next) => {
 
 module.exports.oneTeam = (req, res, next) => {
   Team.findOne({ _id: req.params.id })
+    .populate({
+      path: "captain",
+      select: "location ingame rank role",
+    }).populate({
+      path: "pending",
+      select: "location ingame rank role"
+    }).populate({
+      path: "members",
+      select: "location ingame rank role"
+    })
     .exec()
     .then((response) => {
       res.status(200).json({ data: response });
@@ -84,61 +94,69 @@ module.exports.updateTeam = async (req, res, next) => {
     });
   }
   // Case 1: update basic information without logo
-  if (!req.file) {
-    Team.updateOne({ _id: req.params.id }, req.body)
-      .exec()
-      .then((response) => {
-        res.status(200).json({ success: true, response });
-      })
-      .catch((error) => {
-        res.status(201).json({ success: false, error });
-      });
-  } else if (req.file) {
-    const buffer = Buffer.from(req.file.buffer);
-    const base64String = buffer.toString("base64");
-    const input = "data:image/jpeg;base64," + base64String;
-    cloudinary.uploader
-      .upload(input, {
-        overwrite: true,
-        invalidate: true,
-      })
-      .then((document) => {
-        let update = {
-          teamname: req.body.teamname ? req.body.teamname : isValid.teamname,
-          logo: document.secure_url,
-          shortname: req.body.shortname
-            ? req.body.shortname
-            : isValid.shortname,
-          description: req.body.description
-            ? req.body.description
-            : isValid.description,
-        };
+  if (!req.body.pending && !req.body.members) {
+    console.log("No pending or members update here");
+    if (!req.file) {
+      Team.updateOne({ _id: req.params.id }, req.body)
+        .exec()
+        .then((response) => {
+          res.status(200).json({ success: true, response });
+        })
+        .catch((error) => {
+          res.status(201).json({ success: false, error });
+        });
+    } else if (req.file) {
+      const buffer = Buffer.from(req.file.buffer);
+      const base64String = buffer.toString("base64");
+      const input = "data:image/jpeg;base64," + base64String;
+      cloudinary.uploader
+        .upload(input, {
+          overwrite: true,
+          invalidate: true,
+        })
+        .then((document) => {
+          let update = {
+            teamname: req.body.teamname ? req.body.teamname : isValid.teamname,
+            logo: document.secure_url,
+            shortname: req.body.shortname
+              ? req.body.shortname
+              : isValid.shortname,
+            description: req.body.description
+              ? req.body.description
+              : isValid.description,
+          };
 
-        Team.updateOne({ _id: req.params.id }, update)
-          .exec()
-          .then((response) => {
-            res.status(200).json({ success: true, response });
-          })
-          .catch((error) => {
-            res.status(400).json({ success: false, error });
-          });
-      });
+          Team.updateOne({ _id: req.params.id }, update)
+            .exec()
+            .then((response) => {
+              res.status(200).json({ success: true, response });
+            })
+            .catch((error) => {
+              res.status(400).json({ success: false, error });
+            });
+        });
+    }
   } else if (req.body.pending) {
+    console.log("Pending");
+    console.log(req.body.type);
     switch (req.body.type) {
       case "add":
         Team.updateOne(
           { _id: req.params.id },
           { $push: { pending: { $each: req.body.pending.split(",") } } }
-        );
+        ).exec((error, response) => {
+          if (error) return res.status(400).json({ error });
+          else return res.status(200).json({ response });
+        });
       case "remove":
         Team.updateOne(
           { _id: req.params.id },
           { $pull: { pending: { $in: req.body.pending } } }
         );
-      default:
-        res.status(400).json({ message: "No type were specified" });
     }
   } else if (req.body.members) {
+    console.log("Member");
+    console.log(req.body.type);
     switch (req.body.type) {
       case "add":
         if (isValid.members.length >= 5)

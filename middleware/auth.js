@@ -8,7 +8,7 @@ module.exports = async function (req, res, next) {
   try {
     const decoded = jwt.verify(token, config.get("myPrivateKey"));
     req.user = decoded;
-    console.log(decoded);
+    // console.log(decoded);
     req.player = await Player.findOne({ user: decoded._id });
     next();
   } catch (ex) {
