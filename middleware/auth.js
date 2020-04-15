@@ -12,7 +12,7 @@ module.exports = async function (req, res, next) {
     req.player = await Player.findOne({ user: decoded._id });
     next();
   } catch (ex) {
-    console.log(ex);
+    // console.log(ex);
     res.status(400).send("Invalid token.");
   }
 };

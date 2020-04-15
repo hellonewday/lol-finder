@@ -10,7 +10,7 @@ const UserSchema = new Schema(
       type: String,
       required: true,
       trim: true,
-      min: 10,
+      min: 6,
       max: 20,
       unique: true,
     },
@@ -63,7 +63,7 @@ module.exports = mongoose.model("User", UserSchema);
 
 module.exports.validateUser = (user) => {
   const schema = Joi.object({
-    username: Joi.string().min(10).max(20).required(),
+    username: Joi.string().min(6).max(20).required(),
     email: Joi.string().email().required(),
     password: Joi.string().min(6).max(20).required(),
   });

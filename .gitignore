@@ -7,3 +7,11 @@ flowing-coil-269914-569572b276ae.json
 config/
 
 test.js
+
+.gcloudignore
+
+app.yaml
+
+yarn.lock
+
+yarn-error.log

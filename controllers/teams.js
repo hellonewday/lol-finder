@@ -25,12 +25,14 @@ module.exports.oneTeam = (req, res, next) => {
     .populate({
       path: "captain",
       select: "location ingame rank role",
-    }).populate({
+    })
+    .populate({
       path: "pending",
-      select: "location ingame rank role"
-    }).populate({
+      select: "location ingame rank role",
+    })
+    .populate({
       path: "members",
-      select: "location ingame rank role"
+      select: "location ingame rank role",
     })
     .exec()
     .then((response) => {
@@ -95,7 +97,7 @@ module.exports.updateTeam = async (req, res, next) => {
   }
   // Case 1: update basic information without logo
   if (!req.body.pending && !req.body.members) {
-    console.log("No pending or members update here");
+    // console.log("No pending or members update here");
     if (!req.file) {
       Team.updateOne({ _id: req.params.id }, req.body)
         .exec()
@@ -137,8 +139,8 @@ module.exports.updateTeam = async (req, res, next) => {
         });
     }
   } else if (req.body.pending) {
-    console.log("Pending");
-    console.log(req.body.type);
+    // console.log("Pending");
+    // console.log(req.body.type);
     switch (req.body.type) {
       case "add":
         Team.updateOne(
@@ -155,8 +157,8 @@ module.exports.updateTeam = async (req, res, next) => {
         );
     }
   } else if (req.body.members) {
-    console.log("Member");
-    console.log(req.body.type);
+    // console.log("Member");
+    // console.log(req.body.type);
     switch (req.body.type) {
       case "add":
         if (isValid.members.length >= 5)
@@ -165,15 +167,30 @@ module.exports.updateTeam = async (req, res, next) => {
             message: "Your team has already been full",
           });
         else {
-          // Remove from pending list.
-          // Add them in member list
-          // return Team.updateOne({});
         }
       case "remove":
-        Team.updateOne({});
+        Team.updateOne(
+          { _id: req.params.id },
+          {
+            $pull: { members: { $in: req.body.members } },
+          }
+        ).exec(
+          (error,
+          (response) => {
+            if (error) {
+              return res.status(400).json({ error });
+            } else {
+              return res.status(200).json({ success: true, response });
+            }
+          })
+        );
       default:
         res.status(400).json({ message: "No type were specified" });
     }
+  } else if (req.body.members && req.body.pending) {
+    return res
+      .status(400)
+      .json({ message: "You can't do multiple actions on this endpoint." });
   }
 };
 
